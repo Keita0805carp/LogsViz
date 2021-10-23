@@ -11,6 +11,8 @@ TOKEN = "CHANGEME"  # mapbox API Key
 SECRET = "abcdefg123456789"  # (Option)LogsViz Secret
 ##########################
 ips = {}
+ipv6_regex = r'(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))'
+ipv4_regex = r'(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)'
 
 
 def parse(num):
@@ -28,11 +30,7 @@ def parse(num):
             target = list_tmp[3]
             description = ' '.join(list_tmp[4:])
 
-            try:
-                ip_regex = r'((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])'
-                ip = re.search(ip_regex, description).group()
-            except AttributeError:
-                ip = ""
+            ip = checkIP(description)
 
             if ip != "" and ip in ips:
                 longitude = ips[ip][0]
@@ -72,6 +70,20 @@ def parse(num):
             parsedJson += parsedJson_tmp
     parsedJson[0]["count"] = id
     return parsedJson
+
+
+def checkIP(description):
+    ip = re.search(ipv6_regex, description)
+    if ip != None:
+        ip = ip.group()
+        return ip
+    ip = re.search(ipv4_regex, description)
+    if ip != None:
+        ip = ip.group()
+        return ip
+    else:
+        ip = ""
+        return ip
 
 
 api = Flask(__name__)
