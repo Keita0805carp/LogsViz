@@ -22,7 +22,7 @@
               zoom: 5 // starting zoom
             });
 
-      fetch('/api/{{ secret }}', {})
+      fetch('/api/{{ secret }}?n={{ param }}', {})
         .then(response => {
           if (response.ok) {
             return response.json()
@@ -36,7 +36,14 @@
             const marker = new mapboxgl.Marker()
             marker
               .setLngLat([json[i].longitude, json[i].latitude])
-              .setPopup(new mapboxgl.Popup().setHTML(`<h1>${json[i].sourceIP}</h1><li>${json[i].description}</li>`)) // add popup
+              .setPopup(new mapboxgl.Popup().setHTML(`
+                  <h1>${json[i].sourceIP}</h1>
+                  <p>ID: ${json[i].id}</p>
+                  <p>Datetime: ${json[i].Date} ${json[i].Time}</p>
+                  <p>Target: ${json[i].target}</p>
+                  <p>TargetUser: ${json[i].targetUser}</p>
+                  <p>Description: ${json[i].description}</p>
+                `)) // add popup
               .addTo(map);
           }
         })

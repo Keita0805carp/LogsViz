@@ -1,4 +1,5 @@
 import re
+import time
 import requests
 from datetime import datetime
 from flask import Flask, jsonify, make_response, render_template, request
@@ -9,11 +10,11 @@ PATH = '/var/log/auth.log'
 TOKEN = "CHANGEME"  # mapbox API Key
 SECRET = "abcdefg123456789"  # (Option)LogsViz Secret
 ##########################
+ips = {}
 
 
 def parse(num):
     id = 0
-    ips = {}
     parsedJson = [{"count": id}]
 
     with open(PATH) as f:
@@ -23,7 +24,7 @@ def parse(num):
 
             tmp = ' '.join(list_tmp[:3])
             date = datetime.strptime(tmp, '%b %d %H:%M:%S').strftime('%m/%d')
-            time = datetime.strptime(tmp, '%b %d %H:%M:%S').strftime('%X')
+            ttime = datetime.strptime(tmp, '%b %d %H:%M:%S').strftime('%X')
             target = list_tmp[3]
             description = ' '.join(list_tmp[4:])
 
@@ -37,6 +38,7 @@ def parse(num):
                 longitude = ips[ip][0]
                 latitude = ips[ip][1]
             elif ip != "" and ip not in ips:
+                time.sleep(1)
                 url = "http://ip-api.com/json/"
                 url = str(url) + str(ip)
                 response = requests.get(url)
@@ -58,7 +60,7 @@ def parse(num):
                     {
                         'id': id,
                         'Date': date,
-                        'Time': time,
+                        'Time': ttime,
                         'target': target,
                         'description': description,
                         'sourceIP': ip,
@@ -77,7 +79,7 @@ api = Flask(__name__)
 
 @api.route('/api/<string:key>', methods=["GET"])
 def ret_json(key):
-    num = request.args.get('num', "100")
+    num = request.args.get('n', "100")
     if key == SECRET:
         res = parse(int(num))
     else:
@@ -87,7 +89,8 @@ def ret_json(key):
 
 @api.route("/", methods=["GET"])
 def index():
-    return render_template("index.html", token=TOKEN, secret=SECRET)
+    param = request.args.get('n', "100")
+    return render_template("index.html", param=param, token=TOKEN, secret=SECRET)
 
 
 if __name__ == "__main__":
