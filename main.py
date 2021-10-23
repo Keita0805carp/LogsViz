@@ -28,19 +28,15 @@ def parse(num):
             description = ' '.join(list_tmp[4:])
 
             try:
-                ip_regex = r'''
-                    ((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])
-                '''
+                ip_regex = r'((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])'
                 ip = re.search(ip_regex, description).group()
             except AttributeError:
                 ip = ""
 
             if ip != "" and ip in ips:
-                print("USE CACHE")
                 longitude = ips[ip][0]
                 latitude = ips[ip][1]
             elif ip != "" and ip not in ips:
-                print("USE IP API")
                 url = "http://ip-api.com/json/"
                 url = str(url) + str(ip)
                 response = requests.get(url)
@@ -48,7 +44,6 @@ def parse(num):
                 longitude = str(jsonData['lon'])
                 latitude = str(jsonData['lat'])
                 ips[ip] = [longitude, latitude]
-                print(ips)
             else:
                 latitude = ""
                 longitude = ""
