@@ -18,6 +18,7 @@ ipv4_regex = r'(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4
 
 
 def parse(num):
+    start_time = time.time()
     app.logger.info("API is Called. Parsing...")
     cntTotal = 0
     cntKnownIP = 0
@@ -48,10 +49,17 @@ def parse(num):
                 url = "http://ip-api.com/json/"
                 url = url + str(ip)
                 response = requests.get(url)
-                jsonData = response.json()
-                longitude = str(jsonData['lon'])
-                latitude = str(jsonData['lat'])
-                ips[ip] = [longitude, latitude]
+                try: 
+                    jsonData = response.json()
+                    longitude = jsonData["lon"]
+                    latitude = jsonData["lat"]
+                    ips[ip] = [longitude, latitude]
+                except KeyError as e:
+                    app.logger.info("Key Error. Skip...")
+                    pass
+                except Exception as e:
+                    app.logger.info("Parse Error. Skip...")
+                    pass
             else:
                 cntNullIP += 1
                 latitude = ""
@@ -82,6 +90,7 @@ def parse(num):
     app.logger.info("Known IPs: " + str(cntKnownIP))
     app.logger.info("New IPs  : " + str(cntNewIP))
     app.logger.info("Null IPs : " + str(cntNullIP))
+    app.logger.info("Response Time: %s" % (time.time() - start_time))
     return parsedJson
 
 
