@@ -6,8 +6,8 @@ from flask import Flask, jsonify, make_response, render_template, request
 
 # Configuration ##########
 PORT = 9000
-PATH = '/var/log/auth.log'
 TOKEN = "CHANGEME"  # mapbox API Key
+PATH = '/var/log/auth.log'  # On Docker, do not edit!
 SECRET = "abcdefg123456789"  # (Option)LogsViz Secret
 ##########################
 
@@ -46,7 +46,7 @@ def parse(num):
                 cntNewIP += 1
                 time.sleep(1)
                 url = "http://ip-api.com/json/"
-                url = str(url) + str(ip)
+                url = url + str(ip)
                 response = requests.get(url)
                 jsonData = response.json()
                 longitude = str(jsonData['lon'])

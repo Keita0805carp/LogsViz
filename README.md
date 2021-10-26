@@ -10,15 +10,34 @@
 - [mapbox](https://www.mapbox.com/) account & API key (Free)
 
 ## Install
-```bash
-git clone https://github.com/Keita0805carp/LogsViz.git
-pip3 install -r requirements.txt
-
+1. Configuration
+```
 # Edit config at main.py
 nano/vim/etc... main.py
 
-python3 main.py
+# Configuration ##########
+PORT = 9000
+PATH = '/var/log/auth.log'  # On Docker, do not edit!
+TOKEN = "CHANGEME"  # mapbox API Key
+SECRET = "abcdefg123456789"  # (Option)LogsViz Secret
+##########################
 ```
+
+2. Run
+```bash
+# Run on Host
+git clone https://github.com/Keita0805carp/LogsViz.git
+pip3 install -r requirements.txt
+
+python3 main.py
+
+---
+
+# Run on Docker
+docker build . -t logsviz
+docker run --rm --name logsviz -v /PATH/TO/LOGFILE:/var/log/auth.log -p 9000:9000 logsviz
+```
+
 ## How to Use
 ### Web
 
