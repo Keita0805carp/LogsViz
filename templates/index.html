@@ -38,11 +38,17 @@
               .setLngLat([json[i].longitude, json[i].latitude])
               .setPopup(new mapboxgl.Popup().setHTML(`
                   <h1>${json[i].sourceIP}</h1>
-                  <p>ID: ${json[i].id}</p>
-                  <p>Datetime: ${json[i].Date} ${json[i].Time}</p>
-                  <p>Target: ${json[i].target}</p>
-                  <p>TargetUser: ${json[i].targetUser}</p>
+                  <p>ID:          ${json[i].id}</p>
+                  <p>Datetime:    ${json[i].Date} ${json[i].Time}</p>
+                  <p>Target:      ${json[i].target}</p>
+                  <p>TargetUser:  ${json[i].targetUser}</p>
                   <p>Description: ${json[i].description}</p>
+                  <p>GeoLocation: ${json[i].longitude} ${json[i].latitude}</p>
+                  <p>Country:     ${json[i].country}</p>
+                  <p>Region :     ${json[i].region}</p>
+                  <p>ISP:         ${json[i].isp}</p>
+                  <p>Org:         ${json[i].org}</p>
+                  <p>AS:          ${json[i].asnum}</p>
                 `)) // add popup
               .addTo(map);
           }

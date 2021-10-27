@@ -24,6 +24,7 @@ def parse(num):
     cntKnownIP = 0
     cntNewIP = 0
     cntNullIP = 0
+    cntFail = 0
 
     parsedJson = [{"count": cntTotal}]
     with open(PATH) as f:
@@ -37,14 +38,25 @@ def parse(num):
             target = list_tmp[3]
             description = ' '.join(list_tmp[4:])
 
+            user = re.search(r'user .*? ', description)
+            if user != None:
+                user = user.group()
+                user = user.split()[1]
+            else:
+                user = ""
+
             ip = checkIP(description)
 
             if ip != "" and ip in ips:
                 cntKnownIP += 1
-                longitude = ips[ip][0]
-                latitude = ips[ip][1]
+                longitude = ips[ip]["lon"]
+                latitude  = ips[ip]["lat"]
+                country   = ips[ip]["country"]
+                region    = ips[ip]["region"]
+                isp       = ips[ip]["isp"]
+                org       = ips[ip]["org"]
+                asnum     = ips[ip]["asnum"]
             elif ip != "" and ip not in ips:
-                cntNewIP += 1
                 time.sleep(1)
                 url = "http://ip-api.com/json/"
                 url = url + str(ip)
@@ -53,23 +65,39 @@ def parse(num):
                     jsonData = response.json()
                     longitude = jsonData["lon"]
                     latitude = jsonData["lat"]
-                    ips[ip] = [longitude, latitude]
+                    country = jsonData["country"]
+                    region = jsonData["regionName"]
+                    isp = jsonData["isp"]
+                    org = jsonData["org"]
+                    asnum = jsonData["as"]
+                    ips[ip] = {
+                            "lon": longitude,
+                            "lat": latitude,
+                            "country": country,
+                            "region": region,
+                            "isp": isp,
+                            "org": org,
+                            "asnum": asnum
+                            }
                 except KeyError as e:
-                    app.logger.info("Key Error. Skip...")
+                    cntFail += 1
+                    #app.logger.info("Key Error. Skip...")
                     pass
                 except Exception as e:
-                    app.logger.info("Parse Error. Skip...")
+                    cntFail += 1
+                    #app.logger.info("Parse Error. Skip...")
                     pass
+                else:
+                    cntNewIP += 1
             else:
                 cntNullIP += 1
-                latitude = ""
                 longitude = ""
-
-            try:
-                user = re.search(r'user .*? ', description).group()
-                user = user.split()[1]
-            except AttributeError:
-                user = ""
+                latitude  = ""
+                country   = ""
+                region    = ""
+                isp       = ""
+                org       = ""
+                asnum     = ""
 
             parsedJson_tmp = [
                     {
@@ -81,7 +109,12 @@ def parse(num):
                         'sourceIP': ip,
                         'targetUser': user,
                         'longitude': longitude,
-                        'latitude': latitude
+                        'latitude': latitude,
+                        "country": country,
+                        "region": region,
+                        "isp": isp,
+                        "org": org,
+                        "asnum": asnum
                         }
                     ]
             parsedJson += parsedJson_tmp
@@ -90,6 +123,7 @@ def parse(num):
     app.logger.info("Known IPs: " + str(cntKnownIP))
     app.logger.info("New IPs  : " + str(cntNewIP))
     app.logger.info("Null IPs : " + str(cntNullIP))
+    app.logger.info("Fail     : " + str(cntFail))
     app.logger.info("Response Time: %s" % (time.time() - start_time))
     return parsedJson
 
@@ -106,8 +140,6 @@ def checkIP(description):
     else:
         ip = ""
         return ip
-
-
 
 
 @app.route('/api/<string:key>', methods=["GET"])
