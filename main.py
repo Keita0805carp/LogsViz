@@ -119,12 +119,12 @@ def parse(num):
                     ]
             parsedJson += parsedJson_tmp
     parsedJson[0]["count"] = cntTotal
-    app.logger.info("Total    : " + str(cntTotal))
-    app.logger.info("Known IPs: " + str(cntKnownIP))
-    app.logger.info("New IPs  : " + str(cntNewIP))
-    app.logger.info("Null IPs : " + str(cntNullIP))
-    app.logger.info("Fail     : " + str(cntFail))
-    app.logger.info("Response Time: %s" % (time.time() - start_time))
+    app.logger.info("Total    : %s" % cntTotal)
+    app.logger.info("Known IPs: %s" % cntKnownIP)
+    app.logger.info("New   IPs: %s" % cntNewIP)
+    app.logger.info("Null  IPs: %s" % cntNullIP)
+    app.logger.info("Fail  IPs: %s" % cntFail)
+    app.logger.info("Response : %ss" % (time.time() - start_time))
     return parsedJson
 
 
@@ -160,3 +160,4 @@ def index():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=PORT, debug=True)
+
